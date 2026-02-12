@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Feedback</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f4f4f4;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .student {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px;
+            width: 200px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .student img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 25%;
+        }
+        .feedback {
+            font-weight: bold;
+        }
+
+        .pagination {
+            margin: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Student Feedback</h1>
+
+<div class="container" id="students"></div>
+
+<div class="pagination">
+    <button onclick="prevPage()">Previous</button>
+    <span id="pageInfo"></span>
+    <button onclick="nextPage()">Next</button>
+    <button onclick="resetPage()">Reset</button>
+    <button onclick="toggleRandom()">Random</button>
+</div>
+
+<script>
+let page = 1;
+const limit = 10;
+let totalPages = 1;
+let randomMode = false;
+
+function loadStudents() {
+    let url = `/students?page=${page}&limit=${limit}`;
+
+    if (randomMode) {
+        url += `&random=true`;
+    }
+
+    fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById("students");
+            container.innerHTML = "";
+
+ totalPages = Math.ceil(data.total / limit);
+
+            data.students.forEach(s => {
+                container.innerHTML += `
+                    <div class="student">
+                        <img src="${s.image}" alt="photo">
+                        <h3>${s.name}</h3>
+                        <p>${s.roll_no}</p>
+                        <p class="feedback">${s.feedback}</p>
+                    </div>
+                `;
+            });
+
+            document.getElementById("pageInfo").innerText =
+                `Page ${page} of ${totalPages}` +
+                (randomMode ? " (Random)" : "");
+        });
+}
+
+function nextPage() {
+    if (page < totalPages) {
+        page++;
+        loadStudents();
+    }
+}
+
+function prevPage() {
+    if (page > 1) {
+        page--;
+        loadStudents();
+     }
+}
+
+function resetPage() {
+    page = 1;
+    loadStudents();
+}
+
+function toggleRandom() {
+    randomMode = !randomMode;
+    page = 1;        // reset to first page
+    loadStudents();
+}
+
+// load first page
+loadStudents();
+</script>
+</body>
+</html>
+                                  
