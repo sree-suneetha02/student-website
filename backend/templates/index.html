@@ -1,75 +1,165 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Student Feedback</title>
+    <title>Student Testimonials</title>
+
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background: #f4f4f4;
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 1300px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 15px;
+        background: #222;
+        color: white;
+        border-radius: 10px;
+        font-size: 26px;
+        letter-spacing: 1px;
+    }
+
+    /* Grid */
+    .students-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 25px;
+    }
+
+    /* Testimonial Card */
+    .student-card {
+        background: white;
+        border-radius: 18px;
+        padding: 25px 20px 20px;
+        text-align: center;
+        position: relative;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+    }
+
+    .student-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+    }
+
+    /* Quote icon */
+    .quote {
+        font-size: 40px;
+        color: #ccc;
+        position: absolute;
+        top: 10px;
+        left: 15px;
+    }
+
+    /* Photo */
+    .student-photo {
+        width: 50px;
+        height: 50px;
+        border-radius: 30%;
+        object-fit: cover;
+        border: 3px solid #222;
+        margin-bottom: 10px;
+    }
+
+    /* Name */
+    .student-name {
+        font-size: 16px;
+        font-weight: normal;
+        margin-top: 5px;
+        color: #222;
+    }
+
+    /* Roll number */
+    .student-roll {
+        font-size: 13px;
+        color: #777;
+        margin-bottom: 12px;
+    }
+
+    /* Feedback */
+    .student-feedback {
+        font-size: 14px;
+	font-weight: bold;
+        color: #444;
+        line-height: 1.6;
+        min-height: 110px;
+    }
+
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 40px;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .pagination button {
+        padding: 10px 18px;
+        font-size: 14px;
+        background: #222;
+        border: none;
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .pagination button:hover {
+        background: #000;
+    }
+
+    #pageInfo {
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+        .students-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (max-width: 700px) {
+        .students-grid {
+            grid-template-columns: repeat(1, 1fr);
+        }
+	  h1 {
+            font-size: 20px;
         }
 
-        h1 {
-            margin-top: 20px;
+        .student-card p {
+            height: auto;
+            overflow-y: visible;
         }
-
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .student {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 10px;
-            width: 200px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .student img {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 25%;
-        }
-        .feedback {
-            font-weight: bold;
-        }
-
-        .pagination {
-            margin: 20px;
-        }
-
-        button {
-            padding: 10px 20px;
-            margin: 10px;
-            border: none;
-            background: #007bff;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #0056b3;
-        }
+    }
     </style>
 </head>
+
 <body>
 
-<h1>Student Feedback</h1>
+<div class="container">
+    <h1>Student FeedBack</h1>
 
-<div class="container" id="students"></div>
+    <div class="students-grid" id="students"></div>
 
-<div class="pagination">
-    <button onclick="prevPage()">Previous</button>
-    <span id="pageInfo"></span>
-    <button onclick="nextPage()">Next</button>
-    <button onclick="resetPage()">Reset</button>
-    <button onclick="toggleRandom()">Random</button>
+    <div class="pagination">
+        <button onclick="prevPage()">Previous</button>
+        <span id="pageInfo"></span>
+        <button onclick="nextPage()">Next</button>
+        <button onclick="resetPage()">Reset</button>
+        <button onclick="randomPage()">Random</button>
+    </div>
 </div>
 
 <script>
@@ -82,7 +172,7 @@ function loadStudents() {
     let url = `/students?page=${page}&limit=${limit}`;
 
     if (randomMode) {
-        url += `&random=true`;
+        url += "&random=true";
     }
 
     fetch(url)
@@ -91,53 +181,56 @@ function loadStudents() {
             const container = document.getElementById("students");
             container.innerHTML = "";
 
- totalPages = Math.ceil(data.total / limit);
+            totalPages = Math.ceil(data.total / limit);
 
             data.students.forEach(s => {
                 container.innerHTML += `
-                    <div class="student">
-                        <img src="${s.image}" alt="photo">
-                        <h3>${s.name}</h3>
-                        <p>${s.roll_no}</p>
-                        <p class="feedback">${s.feedback}</p>
-                    </div>
+                    <div class="student-card">
+		    <img class="student-photo" src="${s.image}" alt="photo">
+		    <p>${s.name}</p> 
+		    <div class="student-roll">${s.roll_no}</div>
+		    <h3>${s.feedback}</h3>
+		   </div>
+                   
                 `;
             });
 
-            document.getElementById("pageInfo").innerText =
-                `Page ${page} of ${totalPages}` +
-                (randomMode ? " (Random)" : "");
+            if (randomMode) {
+                document.getElementById("pageInfo").innerText = "Random mode";
+            } else {
+                document.getElementById("pageInfo").innerText =
+                    `Page ${page} of ${totalPages}`;
+            }
         });
 }
 
 function nextPage() {
-    if (page < totalPages) {
+    if (!randomMode && page < totalPages) {
         page++;
         loadStudents();
     }
 }
 
 function prevPage() {
-    if (page > 1) {
+    if (!randomMode && page > 1) {
         page--;
         loadStudents();
-     }
+    }
 }
 
 function resetPage() {
+    randomMode = false;
     page = 1;
     loadStudents();
 }
 
-function toggleRandom() {
-    randomMode = !randomMode;
-    page = 1;        // reset to first page
+function randomPage() {
+    randomMode = true;
     loadStudents();
 }
 
-// load first page
 loadStudents();
 </script>
+
 </body>
 </html>
-                                  
